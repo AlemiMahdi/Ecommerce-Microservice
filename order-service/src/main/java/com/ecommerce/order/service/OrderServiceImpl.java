@@ -1,0 +1,57 @@
+package com.ecommerce.order.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import com.ecommerce.order.dto.OrderRequest;
+import com.ecommerce.order.dto.OrderResponse;
+import com.ecommerce.order.entity.CustomerOrder;
+import com.ecommerce.order.exception.OrderNotFoundException;
+import com.ecommerce.order.mapper.OrderMapper;
+import com.ecommerce.order.repository.OrderRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class OrderServiceImpl implements OrderService{
+
+    private final OrderRepository orderRepository;
+
+    //Skapar en nu order
+    @Override
+    public OrderResponse createOrder(OrderRequest request) {
+        CustomerOrder order = OrderMapper.toEntity(request);
+        CustomerOrder savedOrder = orderRepository.save(order);
+        return OrderMapper.toResponse(savedOrder);
+    }
+
+    //Hämtar alla orders
+    @Override
+    public List<OrderResponse> getAllOrders() {
+        return orderRepository.findAll()
+                .stream()
+                .map(OrderMapper::toResponse)
+                .toList();
+    }
+
+    //Hämta order för en specifik id
+    @Override
+    public OrderResponse getOrderById(Long id) {
+        CustomerOrder order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
+        return OrderMapper.toResponse(order);
+    }
+
+    //Hämta alla orders för en användare
+    @Override
+    public List<OrderResponse> getOrdersByUserId(Long userId) {
+        return orderRepository.findByUserId(userId)
+                .stream()
+                .map(OrderMapper::toResponse)
+                .toList();
+    }
+    
+    
+
+}
