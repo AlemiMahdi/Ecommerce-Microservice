@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import com.ecommerce.order.dto.OrderRequest;
 import com.ecommerce.order.dto.OrderResponse;
 import com.ecommerce.order.entity.CustomerOrder;
+import com.ecommerce.order.entity.OrderStatus;
+import com.ecommerce.order.exception.InvalidOrderStatusException;
 import com.ecommerce.order.exception.OrderNotFoundException;
 import com.ecommerce.order.mapper.OrderMapper;
 import com.ecommerce.order.repository.OrderRepository;
@@ -52,6 +54,20 @@ public class OrderServiceImpl implements OrderService{
                 .toList();
     }
     
-    
+    public OrderResponse cancelOrder(Long id, Long userId){
+        CustomerOrder order = orderRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new OrderNotFoundException(id));
+        
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new InvalidOrderStatusException(
+                "Only orders with status PENDING can be cancelled"
+            );
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        CustomerOrder updatedOrder = orderRepository.save(order);
+        return OrderMapper.toResponse(updatedOrder);
+
+    }
 
 }
