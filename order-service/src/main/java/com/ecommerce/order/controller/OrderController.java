@@ -23,36 +23,36 @@ public class OrderController {
     //Skapa order
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
+            @RequestHeader("X-User-Id") Long userId,
             @Valid @RequestBody OrderRequest request) {
 
-        OrderResponse response = orderService.createOrder(request);
+        OrderResponse response = orderService.createOrder(userId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }
 
-    //Hämta alla orders
-    @GetMapping
-    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+    // //Hämta alla orders
+    // @GetMapping
+    // public ResponseEntity<List<OrderResponse>> getAllOrders() {
 
-        return ResponseEntity.ok(orderService.getAllOrders());
-    }
+    //     return ResponseEntity.ok(orderService.getAllOrders());
+    // }
 
     //Hämta order via id
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long userId
+        ) {
 
-        return ResponseEntity.ok(orderService.getOrderById(id));
+        return ResponseEntity.ok(orderService.getOrderById(id, userId));
     }
 
-    //Hämta alla orders för en användare
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderResponse>> getOrdersByUserId(
-            @PathVariable Long userId) {
-
-        return ResponseEntity.ok(
-                orderService.getOrdersByUserId(userId)
-        );
+    @GetMapping("/my-orders")
+    public ResponseEntity<List<OrderResponse>> getMyOrders(
+            @RequestHeader("X-User-Id") Long userId
+    ) {
+        return ResponseEntity.ok(orderService.getOrdersByUserId(userId));
     }
 }

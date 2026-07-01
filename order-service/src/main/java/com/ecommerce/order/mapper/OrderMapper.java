@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 public class OrderMapper {
 
     //Konverterar OrderRequest till CustomerOrder entity
-    public static CustomerOrder toEntity(OrderRequest request){
+    public static CustomerOrder toEntity(Long userId, OrderRequest request){
         List<OrderItem> items = request.getItems()
                 .stream()
                 .map(OrderMapper::toOrderItem)
@@ -25,7 +25,7 @@ public class OrderMapper {
                 .map(OrderItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return CustomerOrder.builder()
-                .userId(request.getUserId())
+                .userId(userId)
                 .status(OrderStatus.PENDING)
                 .totalAmount(totalAmount)
                 .items(items)

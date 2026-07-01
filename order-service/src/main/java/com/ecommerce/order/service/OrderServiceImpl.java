@@ -20,8 +20,8 @@ public class OrderServiceImpl implements OrderService{
 
     //Skapar en nu order
     @Override
-    public OrderResponse createOrder(OrderRequest request) {
-        CustomerOrder order = OrderMapper.toEntity(request);
+    public OrderResponse createOrder(Long userId,OrderRequest request) {
+        CustomerOrder order = OrderMapper.toEntity(userId, request);
         CustomerOrder savedOrder = orderRepository.save(order);
         return OrderMapper.toResponse(savedOrder);
     }
@@ -37,8 +37,8 @@ public class OrderServiceImpl implements OrderService{
 
     //Hämta order för en specifik id
     @Override
-    public OrderResponse getOrderById(Long id) {
-        CustomerOrder order = orderRepository.findById(id)
+    public OrderResponse getOrderById(Long id, Long userId) {
+        CustomerOrder order = orderRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new OrderNotFoundException(id));
         return OrderMapper.toResponse(order);
     }

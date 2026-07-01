@@ -7,8 +7,8 @@ import com.ecommerce.order.dto.OrderResponse;
 
 public interface OrderService {
 
-    OrderResponse createOrder (OrderRequest request);
+    OrderResponse createOrder (Long userId, OrderRequest request);
     List<OrderResponse> getAllOrders();
-    OrderResponse getOrderById(Long id);
+    OrderResponse getOrderById(Long id, Long userId);
     List<OrderResponse> getOrdersByUserId(Long userId);
 }
