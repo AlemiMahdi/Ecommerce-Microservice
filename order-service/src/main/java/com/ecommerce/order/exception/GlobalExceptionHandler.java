@@ -34,4 +34,16 @@ public class GlobalExceptionHandler {
                 ));
     }
     
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    public ResponseEntity<?> handleInvlidOrderStatus(
+        InvalidOrderStatusException exception
+    ){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "staus", 400,
+                        "error", "BAD_REQEUEST",
+                        "message", exception.getMessage()
+                ));
+    }
 }
