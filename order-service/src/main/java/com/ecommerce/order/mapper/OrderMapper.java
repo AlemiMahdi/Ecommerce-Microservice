@@ -1,29 +1,30 @@
 package com.ecommerce.order.mapper;
 
-import java.util.List;
-
 import com.ecommerce.order.dto.OrderItemRequest;
 import com.ecommerce.order.dto.OrderItemResponse;
-import com.ecommerce.order.dto.OrderRequest;
 import com.ecommerce.order.dto.OrderResponse;
+import com.ecommerce.order.dto.ProductInfoResponse;
 import com.ecommerce.order.entity.CustomerOrder;
 import com.ecommerce.order.entity.OrderItem;
 import com.ecommerce.order.entity.OrderStatus;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-//Mapper som konverterar mellan DTOs och entitiess
+/**
+ * Mapper som konverterar mellan DTOs och entities.
+ */
 public class OrderMapper {
 
-    //Konverterar OrderRequest till CustomerOrder entity
-    public static CustomerOrder toEntity(Long userId, OrderRequest request){
-        List<OrderItem> items = request.getItems()
-                .stream()
-                .map(OrderMapper::toOrderItem)
-                .toList();
+    /**
+     * Skapar CustomerOrder entity från userId och färdiga orderrader.
+     */
+    public static CustomerOrder toEntity(Long userId, List<OrderItem> items) {
+
         BigDecimal totalAmount = items.stream()
                 .map(OrderItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return CustomerOrder.builder()
                 .userId(userId)
                 .status(OrderStatus.PENDING)
@@ -32,26 +33,35 @@ public class OrderMapper {
                 .build();
     }
 
-    //Konverterar OrderItemRequest till OrderItem entity
-    private static OrderItem toOrderItem(OrderItemRequest request){
-        BigDecimal subtotal = request.getUnitPrice()
+    /**
+     * Skapar en OrderItem utifrån request-data och produktdata från product-service.
+     */
+    public static OrderItem toOrderItem(
+            OrderItemRequest request,
+            ProductInfoResponse product
+    ) {
+        BigDecimal subtotal = product.getPrice()
                 .multiply(BigDecimal.valueOf(request.getQuantity()));
-        
+
         return OrderItem.builder()
-                .productId(request.getProductId())
-                .productName(request.getProductName())
+                .productId(product.getId())
+                .productName(product.getName())
                 .quantity(request.getQuantity())
-                .unitPrice(request.getUnitPrice())
+                .unitPrice(product.getPrice())
                 .subtotal(subtotal)
                 .build();
     }
 
-    //Konverterar CustomerOrder entity till OrderResponse DTO
-    public static OrderResponse toResponse(CustomerOrder order){
+    /**
+     * Konverterar CustomerOrder entity till OrderResponse DTO.
+     */
+    public static OrderResponse toResponse(CustomerOrder order) {
+
         List<OrderItemResponse> itemResponses = order.getItems()
                 .stream()
                 .map(OrderMapper::toOrderItemResponse)
                 .toList();
+
         return OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUserId())
@@ -63,8 +73,11 @@ public class OrderMapper {
                 .build();
     }
 
-    //Konverterar OrderItem entity till OrderItemResponse DTO
-    private static OrderItemResponse toOrderItemResponse(OrderItem item){
+    /**
+     * Konverterar OrderItem entity till OrderItemResponse DTO.
+     */
+    private static OrderItemResponse toOrderItemResponse(OrderItem item) {
+
         return OrderItemResponse.builder()
                 .id(item.getId())
                 .productId(item.getProductId())
@@ -74,5 +87,4 @@ public class OrderMapper {
                 .subtotal(item.getSubtotal())
                 .build();
     }
-    
 }

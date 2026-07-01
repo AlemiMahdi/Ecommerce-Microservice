@@ -3,7 +3,9 @@ package com.ecommerce.order.exception;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -43,6 +45,32 @@ public class GlobalExceptionHandler {
                         "timestamp", LocalDateTime.now(),
                         "staus", 400,
                         "error", "BAD_REQEUEST",
+                        "message", exception.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(ProductNotAvailableException.class)
+    public ResponseEntity<?> HandleProductNotAvailable(
+        ProductNotAvailableException exception
+    ){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "staus", 400,
+                        "error", "BAD_REQUEST",
+                        "message", exception.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(ProductserviceException.class)
+    public ResponseEntity<?> handleProductServiceException(
+        ProductserviceException exception
+    ){
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "staus", 503,
+                        "error", "SERVICE_UNAVAILABLE",
                         "message", exception.getMessage()
                 ));
     }
